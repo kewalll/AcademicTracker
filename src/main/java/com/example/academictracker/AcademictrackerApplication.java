@@ -1,0 +1,13 @@
+package com.example.academictracker;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class AcademictrackerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AcademictrackerApplication.class, args);
+	}
+
+}
