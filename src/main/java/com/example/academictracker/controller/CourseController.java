@@ -2,6 +2,7 @@ package com.example.academictracker.controller;
 
 import com.example.academictracker.model.Course;
 import com.example.academictracker.service.CourseService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,22 +23,34 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourse(@PathVariable Long id) {
-        Course course = courseService.getCourseById(id);
-        return course != null ? ResponseEntity.ok(course) : ResponseEntity.notFound().build();
+    public ResponseEntity<?> getCourse(@PathVariable Long id) {
+        try {
+            Course course = courseService.getCourseById(id);
+            return ResponseEntity.ok(course);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Course> addCourse(@RequestBody Course course) {
-        return ResponseEntity.ok(courseService.addCourse(course));
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
+    public ResponseEntity<?> addCourse(@Valid @RequestBody Course course) {
+        try {
+            return ResponseEntity.ok(courseService.addCourse(course));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long id) {
-        courseService.deleteCourse(id);
-        return ResponseEntity.ok("Course deleted successfully");
+    public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
+        try {
+            courseService.deleteCourse(id);
+            return ResponseEntity.ok("Course deleted successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

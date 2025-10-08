@@ -22,10 +22,14 @@ public class CourseService {
     }
 
     public Course getCourseById(Long id) {
-        return courseRepository.findById(id).orElse(null);
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + id));
     }
 
     public void deleteCourse(Long id) {
+        if (!courseRepository.existsById(id)) {
+            throw new IllegalArgumentException("Course not found with ID: " + id);
+        }
         courseRepository.deleteById(id);
     }
 }

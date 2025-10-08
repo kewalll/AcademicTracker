@@ -1,5 +1,6 @@
 package com.example.academictracker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -17,8 +18,9 @@ public class Course {
     @NotBlank
     private String section;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
+    @JsonIgnoreProperties({"password", "hibernateLazyInitializer", "handler"})
     private User teacher;
 
     public Course() {}
