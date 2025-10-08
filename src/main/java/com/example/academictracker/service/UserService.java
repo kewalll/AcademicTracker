@@ -3,9 +3,12 @@ package com.example.academictracker.service;
 import com.example.academictracker.model.Role;
 import com.example.academictracker.model.User;
 import com.example.academictracker.repository.UserRepository;
+import com.example.academictracker.repository.AttendanceRepository;
+import com.example.academictracker.repository.MarksRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,12 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private MarksRepository marksRepository;
 
     public User registerUser(User user) {
         // Validation
@@ -60,10 +69,16 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
     }
 
+    @Transactional
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("User not found with ID: " + id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
+        
+        // Delete related records first
+        attendanceRepository.deleteByStudent(user);
+        marksRepository.deleteByStudent(user);
+        
+        // Now delete the user
         userRepository.deleteById(id);
     }
 }

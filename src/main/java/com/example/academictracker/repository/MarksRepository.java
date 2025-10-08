@@ -12,4 +12,6 @@ import java.util.List;
 public interface MarksRepository extends JpaRepository<Marks, Long> {
     List<Marks> findByStudent(User student);
     List<Marks> findByCourse(Course course);
+    void deleteByStudent(User student);
+    void deleteByCourse(Course course);
 }

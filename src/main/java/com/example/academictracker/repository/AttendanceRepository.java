@@ -14,4 +14,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByStudent(User student);
     List<Attendance> findByCourse(Course course);
     List<Attendance> findByDate(LocalDate date);
+    void deleteByStudent(User student);
+    void deleteByCourse(Course course);
 }

@@ -24,12 +24,14 @@ public class UserController {
     }
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
         Optional<User> user = userService.findByEmail(email);
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             User user = userService.getUserById(id);

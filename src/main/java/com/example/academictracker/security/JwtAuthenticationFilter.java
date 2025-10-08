@@ -32,18 +32,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
-        // 1️⃣ Read JWT from cookie
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
+        // 1️⃣ Try to get JWT from Authorization header first (for Postman/API clients)
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        // 2️⃣ If not in header, try to get from cookie (for browser)
+        if (token == null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("jwt".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        break;
+                    }
                 }
             }
         }
 
-        // 2️⃣ Extract username from token
+        // 3️⃣ Extract username from token
         if (token != null) {
             try {
                 username = jwtUtil.getUsernameFromToken(token);
@@ -52,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // 3️⃣ Authenticate user if username is valid and not already authenticated
+        // 4️⃣ Authenticate user if username is valid and not already authenticated
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -64,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // 4️⃣ Continue filter chain
+        // 5️⃣ Continue filter chain
         filterChain.doFilter(request, response);
     }
 }

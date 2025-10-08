@@ -18,11 +18,13 @@ public class CourseController {
     private CourseService courseService;
 
     @GetMapping("/all")
+    @PreAuthorize("isAuthenticated()")
     public List<Course> getAllCourses() {
         return courseService.getAllCourses();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getCourse(@PathVariable Long id) {
         try {
             Course course = courseService.getCourseById(id);
